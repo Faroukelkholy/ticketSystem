@@ -54,6 +54,16 @@ userSchema.statics.authenticateUser = function authenticateUser(user) {
 userSchema.statics.saveUser = function saveUser(user, admin) {
   const userCreated = new this(user);
   userCreated.name = user.firstname + " " + user.lastname;
+  if(user.type ==='user'){
+    userCreated.permissions= ["ticket.write","ticket.read", "ticket.update"];
+  } else if(user.type ==='operator'){
+    userCreated.permissions= ["ticket.read", "ticket.update"];
+  } else if(user.type ==='admin'){
+    userCreated.permissions= ["user.write","user.read","user.update","user.delete","operator.write","operator.read","operator.update","operator.delete","ticket.read"];
+  }
+  console.log('saveUSer userCreated',userCreated);
+  console.log('saveUSer typeof userCreated',typeof userCreated);
+
   const userToUpsert = userCreated.toObject();
   delete userToUpsert._id;
   const options = {
@@ -78,9 +88,9 @@ userSchema.statics.getUsers = function getUsers() {
   });
 };
 
-userSchema.statics.findUser = function findUser(user) {
+userSchema.statics.getUser = function getUser(email) {
   return this.find({
-    email: user.email
+    email: email
   });
 };
 
@@ -130,7 +140,8 @@ userSchema.statics.changePassword = function changePassword(email, password) {
 userSchema.index({
   emails: 1
 }, {
-  unique: true
+  unique: true,
+  sparse:true
 });
 
 module.exports = userSchema;
