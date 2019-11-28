@@ -59,20 +59,20 @@ const users = [{
     }
 ];
 const currentDate = moment(new Date()).format('D MMM YYYY,h:mm:ss a');
-const userAssigner = {name:"ahmed samir",email:"ahmed@gmail.com", mobile:"01111011111"};
+const author = {name:"ahmed samir",email:"ahmed@gmail.com", mobile:"01111011111"};
 const assignee = {name:"karim hamdi",email:"karim@gmail.com", mobile:"01111011111",assigned_date:currentDate};
 
 const tickets = [{
         title: 'System performance',
         description: 'There a latency in retrieving tickets',
-        author: userAssigner,
+        author: author,
         assigned_to:assignee
     },
     {
         title: 'System Error',
         description: 'There a huge bug in the system',
         status: "Open",
-        author: userAssigner
+        author: author
     }
 ];
 

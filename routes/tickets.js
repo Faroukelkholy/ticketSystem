@@ -7,19 +7,20 @@ mongoDriver.onConnection().then(() => {
   mongoDriver.handleError();
 });
 
+
 /**
-GET /users
-*@return {Status} 200 {"message":"Success", result:users}
+GET /tickets
+*@return {Status} 200 {"message":"Success", result:tickets}
 *@return {Status} 403 Forbidden
 *@return {Status} 500 Internal Server Error
 *@memberof API
 */
 router.get('/', async (req, res) => {
   try {
-    const users = await mongoDriver.user.getUsers();
+    const tickets = await mongoDriver.ticket.getTickets();
     return res.status(200).json({
       message: "Success",
-      result: users
+      result: tickets
     });
   } catch (e) {
     return res.status(500);
@@ -27,29 +28,30 @@ router.get('/', async (req, res) => {
 });
 
 /**
-GET /user/:email
-*@param {String} email req.param.email
-*@return {Status} 200 {"message":"Success", result:user}
+GET /tickets/:id
+*@param {String} id req.param.id
+*@return {Status} 200 {"message":"Success", result:ticket}
 *@return {Status} 403 Forbidden
 *@return {Status} 500 Internal Server Error
 *@memberof API
 */
-router.get('/:email', async (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
-    const user = await mongoDriver.user.getUser(req.param.email);
+    const ticket = await mongoDriver.ticket.getTicket(req.param.id);
     return res.status(200).json({
       message: "Success",
-      result: user
+      result: ticket
     });
   } catch (e) {
     return res.status(500);
   }
 });
 
+
 /**
-POST /users
-*@param {{firstname: string, lastname:string,type: string, email: string,password: string, mobile: number, address: string, gender: string, dob:Date}} user req.body.user
-*@param {{name: string, email: string, mobile: number}} admin req.body.admin
+POST /tickets
+*@param {{title: string,description: string}} ticket req.body.ticket
+*@param {{name: string, email: string, mobile: number}} author req.body.author
 *@return {Status} 200 {"message":"Success"}
 *@return {Status} 403 Forbidden
 *@return {Status} 500 Internal Server Error
@@ -57,7 +59,7 @@ POST /users
 */
 router.post('/', async (req, res) => {
   try {
-    await mongoDriver.user.saveUser(req.body.user, req.body.admin);
+    await mongoDriver.ticket.saveTicket(req.body.ticket, req.body.author);
     return res.status(200).json({
       message: "Success"
     });
@@ -67,16 +69,17 @@ router.post('/', async (req, res) => {
 });
 
 /**
-PUT /user/
-*@param {{email: string, mobile: number, address: string, gender: string, dob:Date}} user req.body.user
+PUT /tickets/
+*@param {{id: string, status: string}} ticket req.body.ticket
+*@param {{name: string, email:string, mobile: number}} assignee req.body.assignee
 *@return {Status} 204 {"message":"Success"}
 *@return {Status} 403 Forbidden
 *@return {Status} 500 Internal Server Error
 *@memberof API
 */
-router.put('/', async (req, res) => {
+router.put('/:id', async (req, res) => {
   try {
-    await mongoDriver.user.editUser(req.body.user);
+    await mongoDriver.ticket.editTicket(req.body.ticket,req.body.assignee);
     return res.status(204).json({
       message: "Success"
     });
@@ -86,16 +89,16 @@ router.put('/', async (req, res) => {
 });
 
 /**
-DELETE /user/:email
-*@param {String} email req.param.email
+DELETE /tickets/:id
+*@param {String} id req.param.id
 *@return {Status} 204 {"message":"Success"}
 *@return {Status} 403 Forbidden
 *@return {Status} 500 Internal Server Error
 *@memberof API
 */
-router.delete('/:email', async (req, res) => {
+router.delete('/:id', async (req, res) => {
   try {
-    await mongoDriver.user.deleteUser(req.param.email);
+    await mongoDriver.ticket.deleteTicket(req.param.id);
     return res.status(204).json({
       message: "Success"
     });
@@ -103,6 +106,8 @@ router.delete('/:email', async (req, res) => {
     return res.status(500);
   }
 });
+
+
 
 
 module.exports = router;
