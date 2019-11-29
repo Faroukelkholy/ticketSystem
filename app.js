@@ -23,8 +23,9 @@ app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
     next();
 });
+app.use(express.static(path.join(__dirname, '/dist/ticketSystemFront')));
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.get('/*',(req,res)=>{ res.sendFile(path.join(__dirname))});
 
 app.use('/auth', authRouter);
 app.use('/users', usersRouter);

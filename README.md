@@ -2,10 +2,9 @@ Ticket System
 =====
 
 ## Table of contents
-* [Generalinfo](#Generalinfo)
+* [GeneralInfo](#GeneralInfo)
 * [Technologies](#Technologies)
 * [Deployment](#Deployment)
-* [UseCases](#UseCases)
 * [Testing](#Testing)
 
 
