@@ -6,16 +6,17 @@ const clientID = settings.oauthCredentials.clientID;
 const clientSecret = settings.oauthCredentials.clientSecret;
 const Token = require("./token");
 var tokenLogic;
-const MongoUFE = require('../storage/mongoUFE.js');
-const mongoUFE = new MongoUFE(settings.mongo);
-mongoUFE.onConnection().then(() => {
-  tokenLogic = new Token(mongoUFE);
+const MongoDriver = require('../storage/mongoDriver.js');
+const mongoDriver = new MongoDriver(settings.mongo);
+mongoDriver.onConnection().then(() => {
+  tokenLogic = new Token(mongoDriver);
 });
-mongoUFE.handleError();
+mongoDriver.handleError();
 
 
 const bearerStrategy = new BearerStrategy(
   function(accessToken, done) {
+    console.log('##strategies.bearerStrategy');
     tokenLogic.findAccessToken(accessToken).then(function(user) {
       if (user) {
         return done(null, user);
@@ -31,8 +32,10 @@ const bearerStrategy = new BearerStrategy(
 
 
 function _clientCredentialsAuth(req, client_Id, client_Secret, done) {
+  console.log('##strategies._clientCredentialsAuth');
   if (clientID === client_Id && client_Secret === clientSecret) {
     let client = {};
+    client.client_Id =  client_Id;
     return done(null, client);
   } else {
     console.log("client not_available");
@@ -46,12 +49,12 @@ function _clientCredentialsAuth(req, client_Id, client_Secret, done) {
 
 
 function passwordTokenExchange(client, email, password, scope, done) {
-  console.log('passwordTokenExchange :', client);
+  console.log('strategies.passwordTokenExchange :', client);
   email = email.toLowerCase();
   let user = {};
   user.email = email;
   user.password = password;
-  mongoUFE.user.authenticateUser(user).then(function(auth_user) {
+  mongoDriver.user.authenticateUser(user).then(function(auth_user) {
     console.log("authenticateUser auth_user :");
     if(!auth_user){
       console.log("authenticateUser !auth_user auth_user :", auth_user);
@@ -93,6 +96,5 @@ module.exports = {
   clientPasswordStrategy: clientPasswordStrategy,
   clientBasicStrategy: clientBasicStrategy,
   bearerStrategy: bearerStrategy,
-  passwordTokenExchange: passwordTokenExchange,
-  refreshTokenExchange: refreshTokenExchange
+  passwordTokenExchange: passwordTokenExchange
 };

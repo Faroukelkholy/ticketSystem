@@ -1,10 +1,12 @@
 const mongoose = require('mongoose');
 const User = require('./models/user.js');
 const Ticket = require('./models/ticket.js');
+const Token = require('./models/token.js');
+
 const when = require("when");
 
 
-class MongoUFE{
+class MongoDriver{
 
   constructor(mongoSettings) {
     this._connect(mongoSettings);
@@ -32,6 +34,7 @@ class MongoUFE{
       console.log("mongoDb connected");
       _this.user = _this.db.model("user", User);
       _this.ticket = _this.db.model("ticket", Ticket);
+      _this.token = _this.db.model("token", Token);
       _this.user.createIndexes().then(function() {
         console.log('create user index successfully');
         return resolve();
@@ -49,4 +52,4 @@ class MongoUFE{
 }
 
 
-module.exports = MongoUFE;
+module.exports = MongoDriver;

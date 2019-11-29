@@ -5,14 +5,14 @@ var tokenSecret = settings.oauthCredentials.tokenSecret;
 var randomstring = require("randomstring");
 
 class Token {
-  constructor(mongoUFE) {
-    this.mongoUFE = mongoUFE;
+  constructor(mongoDriver) {
+    this.mongoDriver = mongoDriver;
   };
 
   findAccessToken(accessToken) {
     let self = this;
     return when.promise(function(resolve, reject) {
-      self.mongoUFE.token.findAccessToken(accessToken).then(function(token) {
+      self.mongoDriver.token.findAccessToken(accessToken).then(function(token) {
         if (!token) {
           return reject();
         }
@@ -52,7 +52,7 @@ class Token {
       });
       // console.log("createAccessToken refreshToken :", refreshToken);
       // var user = jwt.decode(access_token,settings.secret);
-      self.mongoUFE.token.saveToken(auth_user, access_token, refreshToken).then(function(token) {
+      self.mongoDriver.token.saveToken(auth_user, access_token, refreshToken).then(function(token) {
         return resolve(token);
       }).otherwise(function(error) {
         console.log("otherwise saveToken error :", error);

@@ -25,7 +25,6 @@ function needsPermission(scope) {
     console.log("needsPermission permission:",req.user.permissions);
     console.log("needsPermission scopes:",scope);
 
-    
     return function(req, res, next) {
         if (req.user) { //check if user is authenticated first
             if (scope.hasPermission(req.user.permissions, scope)) {

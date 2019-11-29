@@ -2,18 +2,18 @@ const express = require('express');
 const router = express.Router();
 const oauth = require("../oauth/oauth");
 const settings = require("../settings.js");
-const MongoUFE = require('../storage/mongoUFE.js');
-const mongoUFE = new MongoUFE(settings.mongo);
+const MongoDriver = require('../storage/mongoDriver.js');
+const mongoDriver = new MongoDriver(settings.mongo);
 
-mongoUFE.onConnection().then(() => {
-  mongoUFE.handleError();
+mongoDriver.onConnection().then(() => {
+  mongoDriver.handleError();
 });
 
 
 router.post('/token',oauth.token);
 
 router.post('/logout', function(req, res, next) {
-mongoUFE.token.removeToken(req.body.access_token).then((tokenRemoved)=>{
+mongoDriver.token.removeToken(req.body.access_token).then((tokenRemoved)=>{
     return res.status(200).json({
       message: "Success"
     });
