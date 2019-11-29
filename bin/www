@@ -7,6 +7,16 @@
 var app = require('../app');
 var debug = require('debug')('iotblue:server');
 var http = require('http');
+const settings = require('../settings');
+const MongoDriver = require('../storage/mongoDriver');
+const mongoDriver = new MongoDriver(settings.mongo);
+const MqClient = require("../utils/mqClient");
+const mqClient = new MqClient();
+const ticketQueue = '/ticket_id';
+const socketQueue = '/socket_id';
+
+
+
 
 /**
  * Get port from environment and store in Express.
@@ -20,6 +30,30 @@ app.set('port', port);
  */
 
 var server = http.createServer(app);
+var io = require('socket.io')(server);
+
+mongoDriver.onConnection().then(() => {
+  mongoDriver.handleError();
+
+  mqClient.connect(settings.rabbitmq).then(() => {
+    
+    io.on('connection', async function(socket){
+      // mqClient.publishMsg(socketQueue,socket.id);
+      console.log('www socket connection socket.id',socket.id);
+      const msg = await mqClient.consumeMsq(ticketQueue);
+      console.log('www msg consumed in io.on:',msg);
+      const ticket =  await mongoDriver.ticket.getTicket(msg);
+      console.log('wwww ticket queried :',ticket[0]);
+        io.to(socket.id).emit('ticket', ticket[0]);
+    });
+
+  }).catch((error)=>{
+      console.error('mqClient.connect error:', error);
+  });
+
+});
+
+
 
 /**
  * Listen on provided port, on all network interfaces.

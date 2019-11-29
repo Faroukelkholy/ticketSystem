@@ -30,7 +30,7 @@ function needsPermission(scope) {
             if (scope.hasPermission(req.user.permissions, scope)) {
                 return next();
             }
-            return res.status(403).send();
+            return res.status(403);
         } 
     };
 }

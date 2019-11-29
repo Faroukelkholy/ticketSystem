@@ -1,6 +1,7 @@
 const mongoose = require("mongoose"),
   Schema = mongoose.Schema;
 const moment = require("moment");
+var ObjectID = require("mongodb").ObjectID;
 
 const ticket_Schema = new Schema({
   title: {
@@ -27,15 +28,10 @@ const ticket_Schema = new Schema({
 });
 
 ticket_Schema.statics.saveTicket = function saveTicket(ticket, author) {
-  console.log('ticket_Schema.saveTicket:ticket',ticket);
   const ticketCreated = new this(ticket);
-
-  console.log('ticketCreated1 :', ticketCreated);
-
   const currentDate = moment(new Date()).format('D MMM YYYY,h:mm:ss a');
   ticketCreated.ts = currentDate;
   ticketCreated.author = author;
-  console.log('ticketCreated 2:', ticketCreated);
   const ticketToUpsert = ticketCreated.toObject();
   delete ticketToUpsert._id;
   const options = {
@@ -59,8 +55,10 @@ ticket_Schema.statics.getTickets = function getTickets() {
 };
 
 ticket_Schema.statics.getTicket = function getTicket(id) {
+  console.log('typeof id:',typeof id);
+  // ObjectID(id)
   return this.find({
-    _id: id
+    _id: id 
   });
 };
 

@@ -3,8 +3,19 @@ var router = express.Router();
 const settings = require('../settings');
 const MongoDriver = require('../storage/mongoDriver');
 const mongoDriver = new MongoDriver(settings.mongo);
+const MqClient = require("../utils/mqClient");
+const mqClient = new MqClient();
+const ticketQueue = '/ticket_id';
+
 mongoDriver.onConnection().then(() => {
   mongoDriver.handleError();
+
+  mqClient.connect(settings.rabbitmq).then(() => {
+
+  }).catch((error)=>{
+      console.error('mqClient.connect error:', error);
+  });
+
 });
 
 
@@ -60,7 +71,8 @@ POST /tickets
 router.post('/', async (req, res) => {
   try {
     const data = await mongoDriver.ticket.saveTicket(req.body.ticket, req.body.author);
-    console.log('data ;',data);
+    const ticket_id=data.upserted[0]._id;
+    mqClient.publishMsg(ticketQueue,JSON.stringify(ticket_id));
     return res.status(200).json({
       message: "Success"
     });
