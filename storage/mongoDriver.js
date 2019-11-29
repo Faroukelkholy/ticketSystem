@@ -17,7 +17,8 @@ class MongoDriver{
     mongoose.Promise = when.Promise;
     mongoose.set('useCreateIndex', true);  
     mongoose.set('useUnifiedTopology', true);
-    this.db = mongoose.createConnection("mongodb://"+mongoSettings.dbURL + mongoSettings.port + mongoSettings.dbName, { useNewUrlParser: true});
+    // this.db = mongoose.createConnection("mongodb://"+mongoSettings.dbURL + mongoSettings.port + mongoSettings.dbName, { useNewUrlParser: true});
+    this.db = mongoose.createConnection("mongodb://"+mongoSettings.dbURL + mongoSettings.port + mongoSettings.dbName, { useNewUrlParser: true,auth:{authdb:"ufe"},user:mongoSettings.username,pass:mongoSettings.pwd });
     mongoose.set('debug', function (coll, method, query, doc,options) {
         console.log(` Mongoose collection: ${coll.toString()} --method: ${method.toString()} --query: ${Object.values(query)} `);
        });
