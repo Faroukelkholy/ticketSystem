@@ -1,5 +1,6 @@
 const mongoose = require("mongoose"),
   Schema = mongoose.Schema;
+const moment = require("moment");
 
 const ticket_Schema = new Schema({
   title: {
@@ -26,17 +27,22 @@ const ticket_Schema = new Schema({
 });
 
 ticket_Schema.statics.saveTicket = function saveTicket(ticket, author) {
+  console.log('ticket_Schema.saveTicket:ticket',ticket);
   const ticketCreated = new this(ticket);
+
+  console.log('ticketCreated1 :', ticketCreated);
+
   const currentDate = moment(new Date()).format('D MMM YYYY,h:mm:ss a');
   ticketCreated.ts = currentDate;
   ticketCreated.author = author;
+  console.log('ticketCreated 2:', ticketCreated);
   const ticketToUpsert = ticketCreated.toObject();
   delete ticketToUpsert._id;
   const options = {
     upsert: true
   };
   return this.updateOne({
-      "author.email": ticket.author.email,
+      "author.email": author.email,
       "description": ticket.description
     }, {
       $setOnInsert: ticketToUpsert
@@ -69,7 +75,7 @@ ticket_Schema.statics.editTicket = function editTicket(ticket, assignee) {
   }, {
     $set: {
       status: ticket.status,
-      assignee:assignee
+      assignee: assignee
     }
   });
 };
@@ -81,38 +87,57 @@ ticket_Schema.statics.deleteTicket = function deleteTicket(id) {
 };
 
 ticket_Schema.statics.statistics = function statistics() {
-  return this.aggregate([
-    {
-        $project: {
-            ticket: 1,
-            Open: {  
-                $cond: [ { $eq: [ "$status", "Open" ] }, 1, 0]
-            },
-            inProgress: { 
-                $cond: [ { $eq: [ "$status", "inProgress" ] }, 1, 0]
-            },
-            Assigned: { 
-                $cond: [ { $eq: [ "$status", "Assigned" ] }, 1, 0]
-            },
-            Resolved: { 
-                $cond: [ { $eq: [ "$status", "Resolved" ] }, 1, 0]
-            },
-            Closed: { 
-                $cond: [ { $eq: [ "$status", "Closed" ] }, 1, 0]
-            }
+  return this.aggregate([{
+      $project: {
+        ticket: 1,
+        Open: {
+          $cond: [{
+            $eq: ["$status", "Open"]
+          }, 1, 0]
+        },
+        inProgress: {
+          $cond: [{
+            $eq: ["$status", "inProgress"]
+          }, 1, 0]
+        },
+        Assigned: {
+          $cond: [{
+            $eq: ["$status", "Assigned"]
+          }, 1, 0]
+        },
+        Resolved: {
+          $cond: [{
+            $eq: ["$status", "Resolved"]
+          }, 1, 0]
+        },
+        Closed: {
+          $cond: [{
+            $eq: ["$status", "Closed"]
+          }, 1, 0]
         }
+      }
     },
     {
-        $group: {
-            _id: "$ticket",
-            countOpen: { $sum: "$Open" },
-            countInProgress: { $sum: "$inProgress" },
-            countAssigned: { $sum: "$Assigned" },
-            countResolved: { $sum: "$Resolved" },
-            countClosed: { $sum: "$Closed" }
+      $group: {
+        _id: "$ticket",
+        countOpen: {
+          $sum: "$Open"
+        },
+        countInProgress: {
+          $sum: "$inProgress"
+        },
+        countAssigned: {
+          $sum: "$Assigned"
+        },
+        countResolved: {
+          $sum: "$Resolved"
+        },
+        countClosed: {
+          $sum: "$Closed"
         }
+      }
     }
-]);
+  ]);
 }
 
 

@@ -59,7 +59,8 @@ POST /tickets
 */
 router.post('/', async (req, res) => {
   try {
-    await mongoDriver.ticket.saveTicket(req.body.ticket, req.body.author);
+    const data = await mongoDriver.ticket.saveTicket(req.body.ticket, req.body.author);
+    console.log('data ;',data);
     return res.status(200).json({
       message: "Success"
     });
