@@ -9,7 +9,7 @@ Ticket System
 
 
 ## Generalinfo
-This project is a simple Ticket system which should create, list, and assign tickets.
+Ticketing system where is possible to create, list, and finally auto assign tickets to online operators.
 
 > Tickets are auto assigned to an operator when he is available on the operator page only.
 > for an example, 2 operators are active on the operator page and a user create a first ticket and a second ticket. The tickets will be assigned based on FIFO
